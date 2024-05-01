@@ -182,6 +182,43 @@ onMounted(() => {
     addDefaultCamera()
   }
 
+  let state = {xr: false}
+  if (!state.xr) {
+        // Handle frame behavior in WebXR
+        const handleXRFrame = (timestamp: number, frame?: _XRFrame) => {
+          // const state = store.getState()
+          // if (state.frameloop === 'never') return
+          // advance(timestamp, true, state, frame)
+          context.value.renderer.value.render(context.value.scene.value, camera.value)
+        }
+
+        // Toggle render switching on session
+        const handleSessionChange = () => {
+          // const state = store.getState()
+          context.value.renderer.value.xr.enabled = context.value.renderer.value.xr.isPresenting
+
+          context.value.renderer.value.xr.setAnimationLoop(context.value.renderer.value.xr.isPresenting ? handleXRFrame : null)
+          // if (!state.gl.xr.isPresenting) invalidate(state)
+        }
+
+        // WebXR session manager
+        const xr = {
+          connect() {
+            context.value.renderer.value.xr.addEventListener('sessionstart', handleSessionChange)
+            context.value.renderer.value.xr.addEventListener('sessionend', handleSessionChange)
+          },
+          disconnect() {
+            // const gl = store.getState().gl
+            // gl.xr.removeEventListener('sessionstart', handleSessionChange)
+            // gl.xr.removeEventListener('sessionend', handleSessionChange)
+          },
+        }
+
+        // Subscribe to WebXR session events
+        if (typeof context.value.renderer.value.xr?.addEventListener === 'function') xr.connect()
+        // state.set({ xr })
+      }
+
   if (import.meta.hot && context.value) { import.meta.hot.on('vite:afterUpdate', () => dispose(context.value as TresContext)) }
 })
 </script>
