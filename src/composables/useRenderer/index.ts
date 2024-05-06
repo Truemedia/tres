@@ -145,7 +145,10 @@ export function useRenderer(
   })
 
   watch([sizes.width, sizes.height], () => {
-    renderer.value.setSize(sizes.width.value, sizes.height.value)
+    // TODO: Rewrite this section as should work in theory but at the moment doesn't and breaks immersion mode
+    // if (!renderer.value.xr.isPresenting) {
+    //   renderer.value.setSize(sizes.width.value, sizes.height.value)
+    // }
     invalidateOnDemand()
   }, {
     immediate: true,
